@@ -32,11 +32,10 @@ class MyHttpServer
       return MyHttpResponse.new(sock, MyHttpRequest.new).error(MyHttpResponse::BAD_REQUEST)
     end
 
-    request_header = read_request_header(sock) if method
-    request = MyHttpRequest.new(method, path, http_version, request_header)
+    request = MyHttpRequest.create(sock, method, path, http_version)
     response = MyHttpResponse.new(sock, request)
 
-    puts "Accept request for #{method}[#{path}], #{request_header.inspect}"
+    puts "Accept request for #{method}[#{path}], #{request.header.inspect}"
     return_response_for_path(response)
   end
 
@@ -60,15 +59,5 @@ class MyHttpServer
       return nil, nil, nil
     end
     return $1, $2, $3
-  end
-
-  def read_request_header(sock)
-    header = {}
-    while line = sock.gets
-      break if line == "\r\n"
-      key, value = line.chomp.split(/:\s?/, 2)
-      header[key] = value
-    end
-    header
   end
 end

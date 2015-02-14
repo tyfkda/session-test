@@ -29,24 +29,24 @@ class MyHttpServer
   def handle_request(sock)
     method, path, http_version = read_header_top(sock)
     unless method
-      return MyHttpResponse.new(sock, MyHttpRequest.new).error(MyHttpResponse::BAD_REQUEST)
+      return MyHttpResponse.new(sock).error(MyHttpRequest.new, MyHttpResponse::BAD_REQUEST)
     end
 
     request = MyHttpRequest.create(sock, method, path, http_version)
-    response = MyHttpResponse.new(sock, request)
+    response = MyHttpResponse.new(sock)
 
     puts "Accept request for #{method}[#{path}], #{request.header.inspect}"
-    return_response_for_path(response)
+    return_response_for_path(request, response)
   end
 
-  def return_response_for_path(response)
-    unless @contents.has_key?(response.request.method) && @contents[response.request.method].has_key?(response.request.path)
-      return response.error(MyHttpResponse::NOT_FOUND)
+  def return_response_for_path(request, response)
+    unless @contents.has_key?(request.method) && @contents[request.method].has_key?(request.path)
+      return response.error(request, MyHttpResponse::NOT_FOUND)
     end
 
-    content = @contents[response.request.method][response.request.path]
+    content = @contents[request.method][request.path]
     if content.respond_to?(:call)
-      return response.handle_request(content)
+      return response.handle_request(request, content)
     end
 
     sock.print(content)

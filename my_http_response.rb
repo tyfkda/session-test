@@ -9,11 +9,8 @@ class MyHttpResponse
     NOT_FOUND => 'Not Found',
   }
 
-  attr_reader :request
-
-  def initialize(sock, request)
+  def initialize(sock)
     @sock = sock
-    @request = request
 
     @header = {
       'Content-Type' => 'text/html',
@@ -29,10 +26,10 @@ class MyHttpResponse
     @cookies.push(cookie)
   end
 
-  def handle_request(callable)
-    response_body = callable.call(self)
+  def handle_request(request, callable)
+    response_body = callable.call(request, self)
 
-    return_status_line(OK)
+    return_status_line(request, OK)
     @sock.print("Content-Length: #{response_body.length}\r\n")
     @sock.print(@header.map{|k, v| "#{k}: #{v}\r\n"}.join())
     @cookies.each do |line|
@@ -46,14 +43,14 @@ class MyHttpResponse
     @sock.print(value)
   end
 
-  def error(code)
+  def error(request, code)
     $stderr.puts("ERROR: #{code} #{STATUS_MESSAGE[code]}")
-    return_status_line(code)
+    return_status_line(request, code)
     @sock.print("\r\n")
     @sock.print("#{code} #{STATUS_MESSAGE[code]}")
   end
 
-  def return_status_line(code)
-    @sock.print("#{@request.http_version} #{code} #{STATUS_MESSAGE[code]}\r\n")
+  def return_status_line(request, code)
+    @sock.print("#{request.http_version} #{code} #{STATUS_MESSAGE[code]}\r\n")
   end
 end

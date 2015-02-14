@@ -5,6 +5,7 @@ HTTPのセッション管理を自分で行うテスト
 どのように行われているのかわからない。
 そこで基本的な機能のみを使ってセッション管理を行ってみる。
 
+# ノート
 ## サーバ
 
 * Rubyの[TCPServer](http://docs.ruby-lang.org/ja/2.2.0/class/TCPServer.html)を使い、
@@ -29,5 +30,11 @@ HTTPのセッション管理を自分で行うテスト
 
 * クッキーにセッションを識別するID（セッションID）を保存して、ブラウザからのアクセス時にサーバに送られ、
   サーバ側でそれに基づいて処理することができる
+
+
+# ライブラリはどのようにセッションを実装しているか
+## Ruby/CGI/Session
+
+* ソース：[ruby/lib/cgi/session.rb](https://github.com/ruby/ruby/blob/trunk/lib%2Fcgi%2Fsession.rb)
 
 .

@@ -1,7 +1,7 @@
 require 'erb'
 require './my_http_server'
 
-if $0 == __FILE__
+def main
   http_server = MyHttpServer.new(8881)
 
   http_server.add_content('GET', '/') do |request, response|
@@ -33,3 +33,5 @@ EOD
 
   http_server.run
 end
+
+main if $0 == __FILE__
